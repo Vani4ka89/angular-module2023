@@ -1,0 +1,12 @@
+<mat-toolbar color="primary" class="tool-bar">
+  <div class="logo">
+    <img src="./assets/pictures/blue-car-logo-png.webp" alt="car logo">
+  </div>
+  <div *ngIf="user">
+    {{user.username}}
+  </div>
+  <div class="links" *ngIf="!user">
+    <a routerLink="auth/login">Login</a>
+    <a routerLink="auth/register">Register</a>
+  </div>
+</mat-toolbar>
