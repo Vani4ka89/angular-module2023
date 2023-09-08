@@ -5,60 +5,62 @@ import {BehaviorSubject, Observable, tap} from "rxjs";
 import {urls} from "../constants";
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class AuthService {
-  private readonly _accessTokenKey = 'access'
-  private readonly _refreshTokenKey = 'refresh'
-  private authUserSubject = new BehaviorSubject<IAuth>(null)
+    private readonly _accessTokenKey = 'access'
+    private readonly _refreshTokenKey = 'refresh'
+    private authUserSubject = new BehaviorSubject<IAuth>(null)
 
-  constructor(private httpClient: HttpClient) {
-  }
+    constructor(private httpClient: HttpClient) {
+    }
 
-  login(user: IAuth): Observable<ITokens> {
-    return this.httpClient.post<ITokens>(urls.auth.login, user).pipe(
-      tap((tokens) => {
-        this._setTokens(tokens)
-        this.me().subscribe(user => this._setAuthUser(user))
-      })
-    )
-  }
+    login(user: IAuth): Observable<ITokens> {
+        return this.httpClient.post<ITokens>(urls.auth.login, user).pipe(
+            tap((tokens) => {
+                this._setTokens(tokens)
+                this.me().subscribe(user => this._setAuthUser(user))
+            })
+        )
+    }
 
-  refresh(refresh: string): Observable<ITokens> {
-    return this.httpClient.post<ITokens>(urls.auth.refresh, {refresh}).pipe(
-      tap((tokens) => {
-        this._setTokens(tokens)
-      })
-    )
-  }
+    refresh(refresh: string): Observable<ITokens> {
+        return this.httpClient.post<ITokens>(urls.auth.refresh, {refresh}).pipe(
+            tap((tokens) => {
+                this._setTokens(tokens)
+            })
+        )
+    }
 
-  me(): Observable<IAuth> {
-    return this.httpClient.get<IAuth>(urls.auth.me)
-  }
+    me(): Observable<IAuth> {
+        return this.httpClient.get<IAuth>(urls.auth.me).pipe(
+            tap(user => this.authUserSubject.next(user))
+        )
+    }
 
-  getAuthUser(): Observable<IAuth> {
-    return this.authUserSubject.asObservable()
-  }
+    getAuthUser(): Observable<IAuth> {
+        return this.authUserSubject.asObservable()
+    }
 
-  _setAuthUser(user: IAuth): void {
-    return this.authUserSubject.next(user)
-  }
+    _setAuthUser(user: IAuth): void {
+        return this.authUserSubject.next(user)
+    }
 
-  private _setTokens({access, refresh}: ITokens): void {
-    localStorage.setItem(this._accessTokenKey, access)
-    localStorage.setItem(this._refreshTokenKey, refresh)
-  }
+    private _setTokens({access, refresh}: ITokens): void {
+        localStorage.setItem(this._accessTokenKey, access)
+        localStorage.setItem(this._refreshTokenKey, refresh)
+    }
 
-  getAccessToken(): string {
-    return localStorage.getItem(this._accessTokenKey) || ''
-  }
+    getAccessToken(): string {
+        return localStorage.getItem(this._accessTokenKey) || ''
+    }
 
-  getRefreshToken(): string {
-    return localStorage.getItem(this._refreshTokenKey) || ''
-  }
+    getRefreshToken(): string {
+        return localStorage.getItem(this._refreshTokenKey) || ''
+    }
 
-  deleteTokens(): void {
-    localStorage.removeItem(this._accessTokenKey)
-    localStorage.removeItem(this._refreshTokenKey)
-  }
+    deleteTokens(): void {
+        localStorage.removeItem(this._accessTokenKey)
+        localStorage.removeItem(this._refreshTokenKey)
+    }
 }

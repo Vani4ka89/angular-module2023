@@ -3,17 +3,21 @@ import {AuthService} from "../../services/auth.service";
 import {IAuth} from "../../interfaces";
 
 @Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+    selector: 'app-header',
+    templateUrl: './header.component.html',
+    styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-  user: IAuth
+    user: IAuth
 
-  constructor(private authService: AuthService) {
-  }
+    constructor(private authService: AuthService) {
+    }
 
-  ngOnInit(): void {
-    this.authService.getAuthUser().subscribe(value => this.user = value)
-  }
+    ngOnInit(): void {
+        const accessToken = this.authService.getAccessToken();
+        if (accessToken && !this.user) {
+            this.authService.me().subscribe()
+        }
+        this.authService.getAuthUser().subscribe(value => this.user = value)
+    }
 }

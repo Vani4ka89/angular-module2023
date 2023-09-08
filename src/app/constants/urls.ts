@@ -11,7 +11,10 @@ const urls = {
     refresh: `${auth}/refresh`,
     me: `${auth}/me`
   },
-  cars
+  cars: {
+    base: cars,
+    byId: (id: number): string => `${cars}/${id}`
+  }
 };
 
 export {
